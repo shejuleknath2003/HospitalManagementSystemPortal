@@ -141,6 +141,7 @@ function showSection(sectionId) {
     if (sectionId === 'doctors') loadDoctors();
     if (sectionId === 'patients') loadPatients();
     if (sectionId === 'appointments') loadAppointments();
+    if (sectionId === 'prescriptions') loadPrescriptions();
     if (sectionId === 'billings') loadBillings();
 }
 
@@ -618,9 +619,16 @@ function openPrescriptionModal() {
     openModal('modalPrescription');
 }
 
+async function loadPrescriptions() {
+    try {
+        const res = await fetchAPI('/prescription/viewAll');
+        renderPrescriptions(res.data || []);
+    } catch (e) {}
+}
+
 async function searchPrescriptionById() {
     const id = document.getElementById('presc-search-id').value.trim();
-    if (!id) return;
+    if (!id) return loadPrescriptions();
     try {
         const res = await fetchAPI(`/prescription/view/${id}`);
         renderPrescriptions(res.data ? [res.data] : []);
@@ -632,7 +640,7 @@ function renderPrescriptions(prescs) {
     tbody.innerHTML = '';
     if (prescs && prescs.length > 0) {
         prescs.forEach(p => {
-            const apptId = p.appointment ? p.appointment.id : (p.appointmentId || 'N/A');
+            const apptId = p.appointmentId || (p.appointment ? p.appointment.id : 'N/A');
             tbody.innerHTML += `
                 <tr>
                     <td>${p.id}</td>
@@ -657,7 +665,7 @@ function editPrescription(p) {
     document.getElementById('prescModalTitle').innerText = 'Update Prescription';
     document.getElementById('presc-id').value = p.id;
     document.getElementById('presc-id').readOnly = true;
-    document.getElementById('presc-app-id').value = p.appointment ? p.appointment.id : p.appointmentId;
+    document.getElementById('presc-app-id').value = p.appointmentId || (p.appointment ? p.appointment.id : '');
     document.getElementById('presc-diagnosis').value = p.diagnosis;
     document.getElementById('presc-medicines').value = p.medicines;
     document.getElementById('presc-instructions').value = p.instructions;
@@ -683,7 +691,7 @@ async function savePrescription(e) {
         document.getElementById('formPrescription').reset();
         document.getElementById('presc-id').readOnly = false;
         editingMode.prescriptions = false;
-        searchPrescriptionById();
+        loadPrescriptions();
     } catch (err) {}
 }
 
@@ -692,7 +700,7 @@ async function deletePrescription(id) {
     try {
         await fetchAPI(`/prescription/delete/${id}`, { method: 'DELETE' });
         showAlert('Prescription deleted successfully!');
-        document.querySelector('#table-prescriptions tbody').innerHTML = '<tr><td colspan="6" class="text-center text-muted">No prescriptions found</td></tr>';
+        loadPrescriptions();
     } catch (e) {}
 }
 

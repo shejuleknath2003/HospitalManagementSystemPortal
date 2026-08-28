@@ -9,6 +9,7 @@ public class PrescriptionResponseDTO {
 	private String medicines;
 	private String instructions;
 	private LocalDate appointmentDate;
+	private Integer appointmentId;
 	
 	public int getId() {
 		return id;
@@ -40,6 +41,11 @@ public class PrescriptionResponseDTO {
 	public void setAppointmentDate(LocalDate appointmentDate) {
 		this.appointmentDate = appointmentDate;
 	}
-
+	public Integer getAppointmentId() {
+		return appointmentId;
+	}
+	public void setAppointmentId(Integer appointmentId) {
+		this.appointmentId = appointmentId;
+	}
 	
 }

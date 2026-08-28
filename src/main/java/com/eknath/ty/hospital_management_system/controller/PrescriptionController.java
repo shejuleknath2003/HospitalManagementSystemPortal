@@ -1,5 +1,7 @@
 package com.eknath.ty.hospital_management_system.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,6 +40,10 @@ public class PrescriptionController {
     @GetMapping("/view/{id}")
     public ResponseEntity<ResponseStructure<PrescriptionResponseDTO>> viewPrescription(@PathVariable int id) throws ResourceNotFoundException {
         return prescriptionService.findPrescription(id);
+    }
+    @GetMapping("/viewAll")
+    public ResponseEntity<ResponseStructure<List<PrescriptionResponseDTO>>> viewAllPrescriptions() {
+        return prescriptionService.findAllPrescriptions();
     }
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ResponseStructure<String>> deletePrescription(@PathVariable int id){

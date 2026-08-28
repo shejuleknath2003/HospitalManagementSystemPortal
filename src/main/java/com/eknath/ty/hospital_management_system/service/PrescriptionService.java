@@ -1,5 +1,7 @@
 package com.eknath.ty.hospital_management_system.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +57,10 @@ public class PrescriptionService {
         dto.setDiagnosis(savedPrescription.getDiagnosis());
         dto.setMedicines(savedPrescription.getMedicines());
         dto.setInstructions(savedPrescription.getInstructions());
-        dto.setAppointmentDate(savedPrescription.getAppointment().getAppointmentDate());
+        if (savedPrescription.getAppointment() != null) {
+            dto.setAppointmentDate(savedPrescription.getAppointment().getAppointmentDate());
+            dto.setAppointmentId(savedPrescription.getAppointment().getId());
+        }
         ResponseStructure<PrescriptionResponseDTO> rs=new ResponseStructure<>();
         rs.setStatusCode(HttpStatus.OK.value());
         rs.setMessage("Success");
@@ -100,6 +105,28 @@ public class PrescriptionService {
             throw new ResourceNotFoundException("Prescription Not exists");
         }
     }
-	
+
+    //fetch all prescriptions
+    public ResponseEntity<ResponseStructure<List<PrescriptionResponseDTO>>> findAllPrescriptions() {
+        List<Prescription> list = prescriptionRepository.findAll();
+        List<PrescriptionResponseDTO> dtoList = new ArrayList<>();
+        for (Prescription p : list) {
+            PrescriptionResponseDTO dto = new PrescriptionResponseDTO();
+            dto.setId(p.getId());
+            dto.setDiagnosis(p.getDiagnosis());
+            dto.setMedicines(p.getMedicines());
+            dto.setInstructions(p.getInstructions());
+            if (p.getAppointment() != null) {
+                dto.setAppointmentDate(p.getAppointment().getAppointmentDate());
+                dto.setAppointmentId(p.getAppointment().getId());
+            }
+            dtoList.add(dto);
+        }
+        ResponseStructure<List<PrescriptionResponseDTO>> rs = new ResponseStructure<>();
+        rs.setStatusCode(HttpStatus.OK.value());
+        rs.setMessage("Success");
+        rs.setData(dtoList);
+        return new ResponseEntity<ResponseStructure<List<PrescriptionResponseDTO>>>(rs, HttpStatus.OK);
+    }
 	
 }
